@@ -2,5 +2,11 @@
 name = "tv"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
+axum = "0.6"
+
+[dependencies.tokio]
+version = "1.21"
+features = ["rt-multi-thread", "macros"]

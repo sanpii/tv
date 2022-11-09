@@ -4,15 +4,22 @@ use errors::*;
 
 #[tokio::main]
 async fn main() -> Result {
+    #[cfg(debug_assertions)]
+    dotenv::dotenv().ok();
+
     let app = axum::Router::new().route("/seasons/:id", axum::routing::get(seasons));
 
-    let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
+    let bind = format!("{}:{}", env("LISTEN_IP"), env("LISTEN_PORT")).parse()?;
 
-    axum::Server::bind(&addr)
+    axum::Server::bind(&bind)
         .serve(app.into_make_service())
         .await?;
 
     Ok(())
+}
+
+fn env(name: &str) -> String {
+    std::env::var(name).unwrap_or_else(|_| panic!("Missing {} env variable", name))
 }
 
 async fn seasons(

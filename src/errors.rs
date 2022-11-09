@@ -3,6 +3,8 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("{0}")]
+    Bind(#[from] std::net::AddrParseError),
+    #[error("{0}")]
     Client(#[from] reqwest::Error),
     #[error("{0}")]
     Io(#[from] std::io::Error),

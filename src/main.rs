@@ -7,6 +7,7 @@ async fn main() -> Result {
     #[cfg(debug_assertions)]
     dotenv::dotenv().ok();
 
+    env_logger::init();
 
     let app = axum::Router::new()
         .route("/", axum::routing::get(index))

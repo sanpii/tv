@@ -7,7 +7,10 @@ async fn main() -> Result {
     #[cfg(debug_assertions)]
     dotenv::dotenv().ok();
 
-    let app = axum::Router::new().route("/seasons/:id", axum::routing::get(seasons));
+
+    let app = axum::Router::new()
+        .route("/", axum::routing::get(index))
+        .route("/seasons/:id", axum::routing::get(seasons));
 
     let bind = format!("{}:{}", env("LISTEN_IP"), env("LISTEN_PORT")).parse()?;
 
@@ -19,7 +22,48 @@ async fn main() -> Result {
 }
 
 fn env(name: &str) -> String {
-    std::env::var(name).unwrap_or_else(|_| panic!("Missing {} env variable", name))
+    std::env::var(name).unwrap_or_else(|_| panic!("Missing {name} env variable"))
+}
+
+#[derive(Debug, Default, serde::Deserialize)]
+struct Search {
+    q: Option<String>,
+}
+
+async fn index(axum::extract::Query(params): axum::extract::Query<Search>) -> Result<maud::Markup> {
+    let results: Vec<SearchResult> = if let Some(ref q) = params.q {
+        reqwest::get(&format!("https://api.tvmaze.com/search/shows?q={q}"))
+            .await?
+            .json()
+            .await?
+    } else {
+        Vec::new()
+    };
+
+    let contents = maud::html! {
+        head {
+        }
+        body {
+            form {
+                input type="text" name="q" value=(params.q.unwrap_or_default());
+                " "
+                input type="submit" value="Search";
+            }
+            @if !results.is_empty() {
+                ul {
+                    @for result in &results {
+                        li {
+                            a href={ "/seasons/" (result.show.id) } {
+                                (result.show.name)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    Ok(contents)
 }
 
 async fn seasons(
@@ -41,7 +85,13 @@ async fn seasons(
 }
 
 #[derive(Debug, serde::Deserialize)]
+struct SearchResult {
+    show: Show,
+}
+
+#[derive(Debug, serde::Deserialize)]
 struct Show {
+    id: u32,
     name: String,
 }
 

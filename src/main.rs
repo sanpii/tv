@@ -97,10 +97,12 @@ struct Show {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Season {
     id: u32,
     number: u32,
     url: String,
+    premiere_date: Option<String>,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -115,10 +117,12 @@ impl Feed {
         Self {
             items: seasons
                 .iter()
+                .filter(|x| x.premiere_date.is_some())
                 .map(|x| Item {
                     id: x.id.to_string(),
                     title: format!("{} - Saison {}", show.name, x.number),
                     url: x.url.clone(),
+                    date_published: format!("{}T00:00:00-00:00", x.premiere_date.as_ref().unwrap()),
                 })
                 .collect(),
             title: show.name,
@@ -132,4 +136,5 @@ struct Item {
     id: String,
     title: String,
     url: String,
+    date_published: String,
 }

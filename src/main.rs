@@ -80,7 +80,7 @@ async fn seasons(
         .json()
         .await?;
 
-    let feed = Feed::from(show, seasons);
+    let feed = Feed::from(show, &seasons);
 
     Ok(axum::response::Json(feed))
 }
@@ -113,7 +113,7 @@ struct Feed {
 }
 
 impl Feed {
-    fn from(show: Show, seasons: Vec<Season>) -> Self {
+    fn from(show: Show, seasons: &[Season]) -> Self {
         Self {
             items: seasons
                 .iter()

@@ -5,7 +5,7 @@ use errors::*;
 #[tokio::main]
 async fn main() -> Result {
     #[cfg(debug_assertions)]
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     env_logger::init();
 

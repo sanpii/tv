@@ -5,7 +5,7 @@ use errors::*;
 #[tokio::main]
 async fn main() -> Result {
     #[cfg(debug_assertions)]
-    dotenvy::dotenv().ok();
+    envir::dotenv();
 
     env_logger::init();
 
@@ -13,17 +13,13 @@ async fn main() -> Result {
         .route("/", axum::routing::get(index))
         .route("/seasons/:id", axum::routing::get(seasons));
 
-    let bind = format!("{}:{}", env("LISTEN_IP"), env("LISTEN_PORT")).parse()?;
+    let bind = format!("{}:{}", envir::get("LISTEN_IP")?, envir::get("LISTEN_PORT")?).parse()?;
 
     axum::Server::bind(&bind)
         .serve(app.into_make_service())
         .await?;
 
     Ok(())
-}
-
-fn env(name: &str) -> String {
-    std::env::var(name).unwrap_or_else(|_| panic!("Missing {name} env variable"))
 }
 
 #[derive(Debug, Default, serde::Deserialize)]

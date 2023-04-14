@@ -5,6 +5,8 @@ pub enum Error {
     #[error("{0}")]
     Bind(#[from] std::net::AddrParseError),
     #[error("{0}")]
+    Env(#[from] envir::Error),
+    #[error("{0}")]
     Client(#[from] reqwest::Error),
     #[error("{0}")]
     Io(#[from] std::io::Error),

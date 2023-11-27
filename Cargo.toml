@@ -12,8 +12,7 @@ hyper = "0.14"
 thiserror = "1.0"
 
 [dependencies.maud]
-git = "https://github.com/mhutter/maud"
-branch = "axum-0.6"
+version = "0.25"
 features = ["axum"]
 
 [dependencies.reqwest]

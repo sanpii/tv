@@ -13,10 +13,10 @@ async fn main() -> Result {
         .route("/", axum::routing::get(index))
         .route("/seasons/:id", axum::routing::get(seasons));
 
-    let bind = format!("{}:{}", envir::get("LISTEN_IP")?, envir::get("LISTEN_PORT")?).parse()?;
+    let bind = format!("{}:{}", envir::get("LISTEN_IP")?, envir::get("LISTEN_PORT")?);
+    let listener = tokio::net::TcpListener::bind(bind).await?;
 
-    axum::Server::bind(&bind)
-        .serve(app.into_make_service())
+    axum::serve(listener, app)
         .await?;
 
     Ok(())

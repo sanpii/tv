@@ -8,7 +8,7 @@ license = "MIT"
 axum = "0.6"
 env_logger = "0.10"
 envir = "0.2"
-hyper = "0.14"
+hyper = "1.1"
 thiserror = "1.0"
 
 [dependencies.maud]

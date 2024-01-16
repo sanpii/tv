@@ -12,7 +12,7 @@ hyper = "0.14"
 thiserror = "1.0"
 
 [dependencies.maud]
-version = "0.25"
+version = "0.26"
 features = ["axum"]
 
 [dependencies.reqwest]

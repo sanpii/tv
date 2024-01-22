@@ -6,7 +6,7 @@ license = "MIT"
 
 [dependencies]
 axum = "0.7"
-env_logger = "0.10"
+env_logger = "0.11"
 envir = "0.2"
 hyper = "1.0"
 thiserror = "1.0"

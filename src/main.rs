@@ -4,10 +4,7 @@ use errors::*;
 
 #[tokio::main]
 async fn main() -> Result {
-    #[cfg(debug_assertions)]
-    envir::dotenv();
-
-    env_logger::init();
+    envir::init();
 
     let app = axum::Router::new()
         .route("/", axum::routing::get(index))

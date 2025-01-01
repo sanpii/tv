@@ -5,14 +5,11 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-axum = "0.7"
+axum = "0.8"
 envir = "1.0"
 hyper = "1.0"
+maud = "0.26"
 thiserror = "2.0"
-
-[dependencies.maud]
-version = "0.26"
-features = ["axum"]
 
 [dependencies.reqwest]
 version = "0.12"

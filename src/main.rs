@@ -10,11 +10,14 @@ async fn main() -> Result {
         .route("/", axum::routing::get(index))
         .route("/seasons/{id}", axum::routing::get(seasons));
 
-    let bind = format!("{}:{}", envir::get("LISTEN_IP")?, envir::get("LISTEN_PORT")?);
+    let bind = format!(
+        "{}:{}",
+        envir::get("LISTEN_IP")?,
+        envir::get("LISTEN_PORT")?
+    );
     let listener = tokio::net::TcpListener::bind(bind).await?;
 
-    axum::serve(listener, app)
-        .await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }
@@ -24,7 +27,9 @@ struct Search {
     q: Option<String>,
 }
 
-async fn index(axum::extract::Query(params): axum::extract::Query<Search>) -> Result<axum::response::Html<String>> {
+async fn index(
+    axum::extract::Query(params): axum::extract::Query<Search>,
+) -> Result<axum::response::Html<String>> {
     let results: Vec<SearchResult> = if let Some(ref q) = params.q {
         reqwest::get(&format!("https://api.tvmaze.com/search/shows?q={q}"))
             .await?

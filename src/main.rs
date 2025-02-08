@@ -101,6 +101,7 @@ struct Season {
 #[derive(Debug, serde::Serialize)]
 struct Feed {
     version: &'static str,
+    icon: &'static str,
     title: String,
     items: Vec<Item>,
 }
@@ -119,6 +120,7 @@ impl Feed {
                 })
                 .collect(),
             title: show.name,
+            icon: "https://static.tvmaze.com/images/favico/favicon.ico",
             version: "https://jsonfeed.org/version/1.1",
         }
     }

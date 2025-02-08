@@ -1,6 +1,8 @@
 mod errors;
+mod feed;
 
 use errors::*;
+use feed::Feed;
 
 #[tokio::main]
 async fn main() -> Result {
@@ -101,40 +103,4 @@ struct Season {
     number: u32,
     url: String,
     premiere_date: Option<String>,
-}
-
-#[derive(Debug, serde::Serialize)]
-struct Feed {
-    version: &'static str,
-    icon: &'static str,
-    title: String,
-    items: Vec<Item>,
-}
-
-impl Feed {
-    fn from(show: Show, seasons: &[Season]) -> Self {
-        Self {
-            items: seasons
-                .iter()
-                .filter(|x| x.premiere_date.is_some())
-                .map(|x| Item {
-                    id: x.id.to_string(),
-                    title: format!("{} - Saison {}", show.name, x.number),
-                    url: x.url.clone(),
-                    date_published: format!("{}T00:00:00-00:00", x.premiere_date.as_ref().unwrap()),
-                })
-                .collect(),
-            title: show.name,
-            icon: "https://static.tvmaze.com/images/favico/favicon.ico",
-            version: "https://jsonfeed.org/version/1.1",
-        }
-    }
-}
-
-#[derive(Debug, serde::Serialize)]
-struct Item {
-    id: String,
-    title: String,
-    url: String,
-    date_published: String,
 }

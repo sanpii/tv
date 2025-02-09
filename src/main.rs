@@ -77,10 +77,9 @@ async fn seasons(
         .json()
         .await?;
 
-    let seasons: Vec<Season> = reqwest::get(&format!("https://api.tvmaze.com/shows/{id}/seasons"))
-        .await?
-        .json()
-        .await?;
+    let request = reqwest::get(&format!("https://api.tvmaze.com/shows/{id}/seasons")).await?;
+    let headers = request.headers().clone();
+    let seasons: Vec<Season> = request.json().await?;
 
     let feed = Feed::from(show, &seasons);
 
@@ -89,6 +88,12 @@ async fn seasons(
         axum::http::header::CONTENT_TYPE,
         axum::http::HeaderValue::from_static("application/feed+json"),
     );
+
+    if let Some(last_modified) = headers.get(axum::http::header::LAST_MODIFIED) {
+        response
+            .headers_mut()
+            .insert(axum::http::header::LAST_MODIFIED, last_modified.clone());
+    }
 
     Ok(response)
 }

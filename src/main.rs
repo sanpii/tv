@@ -69,7 +69,9 @@ async fn index(
 
 async fn seasons(
     axum::extract::Path(id): axum::extract::Path<u32>,
-) -> Result<axum::response::Json<Feed>> {
+) -> Result<axum::response::Response<axum::body::Body>> {
+    use axum::response::IntoResponse as _;
+
     let show: Show = reqwest::get(&format!("https://api.tvmaze.com/shows/{id}"))
         .await?
         .json()
@@ -82,7 +84,13 @@ async fn seasons(
 
     let feed = Feed::from(show, &seasons);
 
-    Ok(axum::response::Json(feed))
+    let mut response = axum::response::Json(feed).into_response();
+    response.headers_mut().insert(
+        axum::http::header::CONTENT_TYPE,
+        axum::http::HeaderValue::from_static("application/feed+json"),
+    );
+
+    Ok(response)
 }
 
 #[derive(Debug, serde::Deserialize)]

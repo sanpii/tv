@@ -22,3 +22,7 @@ features = ["derive"]
 [dependencies.tokio]
 version = "1.21"
 features = ["rt-multi-thread", "macros"]
+
+[dependencies.tower]
+version = "0.5"
+features = ["limit"]

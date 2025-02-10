@@ -8,9 +8,12 @@ use feed::Feed;
 async fn main() -> Result {
     envir::init();
 
+    let limit_rate = envir::try_parse("LIMIT_RATE")?.unwrap_or(1);
+
     let app = axum::Router::new()
         .route("/", axum::routing::get(index))
-        .route("/seasons/{id}", axum::routing::get(seasons));
+        .route("/seasons/{id}", axum::routing::get(seasons))
+        .layer(tower::limit::GlobalConcurrencyLimitLayer::new(limit_rate));
 
     let bind = format!(
         "{}:{}",

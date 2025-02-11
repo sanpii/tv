@@ -8,7 +8,9 @@ license = "MIT"
 axum = "0.8"
 envir = "1.0"
 hyper = "1.0"
+log = "0.4"
 maud = "0.27"
+serde_json = "1.0"
 thiserror = "2.0"
 
 [dependencies.reqwest]

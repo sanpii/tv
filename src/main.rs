@@ -1,6 +1,8 @@
+mod cache;
 mod errors;
 mod feed;
 
+use cache::Cache;
 use errors::*;
 use feed::Feed;
 
@@ -9,11 +11,13 @@ async fn main() -> Result {
     envir::init();
 
     let limit_rate = envir::try_parse("LIMIT_RATE")?.unwrap_or(1);
+    let cache = Cache::new()?;
 
     let app = axum::Router::new()
         .route("/", axum::routing::get(index))
         .route("/seasons/{id}", axum::routing::get(seasons))
-        .layer(tower::limit::GlobalConcurrencyLimitLayer::new(limit_rate));
+        .layer(tower::limit::GlobalConcurrencyLimitLayer::new(limit_rate))
+        .with_state(cache.into());
 
     let bind = format!(
         "{}:{}",
@@ -72,13 +76,11 @@ async fn index(
 
 async fn seasons(
     axum::extract::Path(id): axum::extract::Path<u32>,
+    axum::extract::State(cache): axum::extract::State<std::sync::Arc<Cache>>,
 ) -> Result<axum::response::Response<axum::body::Body>> {
     use axum::response::IntoResponse as _;
 
-    let show: Show = reqwest::get(&format!("https://api.tvmaze.com/shows/{id}"))
-        .await?
-        .json()
-        .await?;
+    let show = Show::get(&cache, id).await?;
 
     let request = reqwest::get(&format!("https://api.tvmaze.com/shows/{id}/seasons")).await?;
     let headers = request.headers().clone();
@@ -110,6 +112,14 @@ struct SearchResult {
 struct Show {
     id: u32,
     name: String,
+}
+
+impl Show {
+    async fn get(cache: &Cache, id: u32) -> Result<Self> {
+        let contents = cache.get(id).await?;
+
+        serde_json::from_str(&contents).map_err(Into::into)
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
